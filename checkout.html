@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Ordo Umbra</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="bladeGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2a2620"/>
+      <stop offset="45%" stop-color="#d8d2c4"/>
+      <stop offset="100%" stop-color="#fdf8ec"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<div id="assassin-cursor">
+  <svg width="64" height="64" viewBox="0 0 64 64">
+    <defs>
+      <linearGradient id="cursorBladeGrad" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="#2a2620"/>
+        <stop offset="45%" stop-color="#d8d2c4"/>
+        <stop offset="100%" stop-color="#fdf8ec"/>
+      </linearGradient>
+      <linearGradient id="cursorSkinGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#dcc7a4"/>
+        <stop offset="100%" stop-color="#a98a63"/>
+      </linearGradient>
+    </defs>
+    <g class="hand-grip">
+      <rect x="22" y="30" width="16" height="30" rx="4" fill="#3a281c" stroke="#181008" stroke-width="1"/>
+      <rect x="21" y="35" width="18" height="3" fill="#a9803f"/>
+      <rect x="21" y="46" width="18" height="3" fill="#a9803f"/>
+      <path d="M22 30 C18 27 16 22 18 17 C19 14 22 13 23 16 C23 12 26 10 28 13 C28 10 31 9 32 12 C33 10 36 11 35 14 C38 15 38 19 36 22 L30 30 Z"
+            fill="url(#cursorSkinGrad)" stroke="#181008" stroke-width="1"/>
+    </g>
+    <g class="blade">
+      <path d="M30 26 L58 6 L54 4 L28 22 Z" fill="url(#cursorBladeGrad)" stroke="#181008" stroke-width="0.8"/>
+      <line class="glint" x1="33" y1="22" x2="53" y2="8" stroke="#fdf8ec" stroke-width="1"/>
+    </g>
+  </svg>
+</div>
+
+<nav>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L4 6v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6l-8-4z" stroke="url(#bladeGrad)" stroke-width="1.2" fill="none"/><path d="M12 7v10M9 10l3-3 3 3" stroke="url(#bladeGrad)" stroke-width="1" fill="none"/></svg>
+    ORDO&nbsp;UMBRA
+  </div>
+  <div class="navlinks">
+    <a href="index.html">Home</a>
+    <a href="armory.html">The Armory</a>
+    <a href="cart.html" class="cart-link" aria-label="Cart">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 6h2l2.2 11.2a1.5 1.5 0 0 0 1.5 1.3h7.6a1.5 1.5 0 0 0 1.5-1.2L20 9H7"/><circle cx="10" cy="20.5" r="1"/><circle cx="17" cy="20.5" r="1"/></svg>
+      <span class="cart-badge">0</span>
+    </a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1 class="reveal">Seal the Order</h1>
+  <p class="reveal">Confirm your details. What you choose now cannot be unchosen.</p>
+</div>
+
+<section style="padding-top:0;">
+  <div id="checkout-root"></div>
+</section>
+
+<footer>
+  <div>© Ordo Umbra — A fictional order. All craft is imagined.</div>
+  <div class="foot-links">
+    <a href="index.html#creed">The Creed</a>
+    <a href="armory.html">The Armory</a>
+    <a href="cart.html">The Cart</a>
+  </div>
+</footer>
+
+<script src="assets/data/products.js"></script>
+<script src="assets/js/cart.js"></script>
+<script src="assets/js/payment.js"></script>
+<script>
+const root = document.getElementById('checkout-root');
+const lines = ordoCartLines();
+
+if(lines.length === 0){
+
+  root.innerHTML = `
+    <div class="cart-empty">
+      Nothing to seal — the satchel is empty.<br><br>
+      <a class="btn" href="armory.html">Visit the Armory</a>
+    </div>
+  `;
+
+} else {
+
+  const total = ordoCartTotal();
+  const summaryLines = lines.map(l => `
+    <div class="order-line"><span>${l.name} × ${l.qty}</span><span>${ordoFormatPrice(l.lineTotal)}</span></div>
+  `).join('');
+
+  root.innerHTML = `
+    <div class="checkout-grid">
+      <div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="f-name" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="f-email" placeholder="you@example.com" required>
+        </div>
+        <div class="form-group">
+          <label>Delivery Address</label>
+          <input type="text" id="f-address" placeholder="Street address" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>City</label>
+            <input type="text" id="f-city" required>
+          </div>
+          <div class="form-group">
+            <label>Postal Code</label>
+            <input type="text" id="f-zip" required>
+          </div>
+        </div>
+
+        <label style="display:block; font-family:'Cinzel',serif; font-size:0.65rem; letter-spacing:0.14em; color:var(--brass); margin:2rem 0 0.8rem;">PAYMENT METHOD</label>
+        <div class="payment-methods" id="payment-methods">
+          <div class="payment-method selected" data-method="card">Card</div>
+          <div class="payment-method" data-method="paypal">PayPal</div>
+          <div class="payment-method" data-method="other">Other</div>
+        </div>
+        <p class="checkout-note">Payment is simulated for now — no real charge is made. Tell me which provider you'd like (Stripe, PayPal, etc.) and this connects to it directly.</p>
+
+        <div style="margin-top:2rem;">
+          <button class="btn btn-fill" id="pay-btn" style="width:100%; text-align:center;">Confirm &amp; Pay ${ordoFormatPrice(total)}</button>
+        </div>
+      </div>
+
+      <div class="order-summary reveal">
+        <h3>Order Summary</h3>
+        ${summaryLines}
+        <div class="order-total"><span>Total</span><span>${ordoFormatPrice(total)}</span></div>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll('.payment-method').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      document.querySelectorAll('.payment-method').forEach(m=>m.classList.remove('selected'));
+      el.classList.add('selected');
+    });
+  });
+
+  document.getElementById('pay-btn').addEventListener('click', async ()=>{
+    const name = document.getElementById('f-name').value.trim();
+    const email = document.getElementById('f-email').value.trim();
+    const address = document.getElementById('f-address').value.trim();
+    const city = document.getElementById('f-city').value.trim();
+    const zip = document.getElementById('f-zip').value.trim();
+
+    if(!name || !email || !address || !city || !zip){
+      ordoShowToast('Fill in every field before you proceed');
+      return;
+    }
+
+    const btn = document.getElementById('pay-btn');
+    btn.disabled = true;
+    btn.textContent = 'Processing…';
+
+    const order = {
+      items: lines.map(l => ({ id:l.id, name:l.name, qty:l.qty, price:l.price })),
+      total,
+      customer: { name, email, address:`${address}, ${city} ${zip}` }
+    };
+
+    try{
+      const result = await processPayment(order);
+      if(result && result.success){
+        localStorage.removeItem(ORDO_CART_KEY);
+        ordoUpdateCartBadge();
+        root.innerHTML = `
+          <div class="success-panel">
+            <div class="tenet-glyph">✓</div>
+            <h2>The order is sealed.</h2>
+            <p>Confirmation ${result.orderId} — a record of this exchange, kept as we keep everything: quietly.</p>
+            <a class="btn btn-fill" href="armory.html">Return to the Armory</a>
+          </div>
+        `;
+      } else {
+        ordoShowToast('Payment did not go through — try again');
+        btn.disabled = false;
+        btn.textContent = `Confirm & Pay ${ordoFormatPrice(total)}`;
+      }
+    }catch(e){
+      ordoShowToast('Something interrupted the payment');
+      btn.disabled = false;
+      btn.textContent = `Confirm & Pay ${ordoFormatPrice(total)}`;
+    }
+  });
+}
+</script>
+<script src="assets/js/reveal.js"></script>
+<script src="assets/js/cursor.js"></script>
+<script src="assets/js/transitions.js"></script>
+</body>
+</html>
